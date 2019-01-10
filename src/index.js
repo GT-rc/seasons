@@ -1,12 +1,47 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+//import SeasonDisplay from './SeasonDisplay';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+class App extends React.Component {
+    // not required by react, but needed for state
+    constructor(props) {
+        super(props);  // this line is ALWAYS required by the base class (Component)
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-serviceWorker.unregister();
+        this.state = { lat: null, errorMessage: '' };
+
+        window.navigator.geolocation.getCurrentPosition(
+            (position) => {
+                this.setState({ lat: position.coords.latitude });  // setState to update the state!  :)
+            },
+            (err) => {
+                this.setState({ errorMessage: err.message })
+            }
+        );
+    }
+
+    componentDidMount() {
+        console.log('it worked! Eureka!');
+    }
+
+    componentDidUpdate() {
+        console.log('it updated!');
+    }
+
+    // react requires us to define render!
+    render() {
+        if (this.state.errorMessage && !this.state.lat) {
+            return <div><h3>Error: {this.state.errorMessage}</h3></div>;
+        }
+        if (!this.state.errorMessage && this.state.lat) {
+            return <div><h3>Hiya buddy! You're at {this.state.lat} degrees Latitude.</h3></div>;
+        }
+
+        return <div><h3>Loading...</h3></div>;
+    }
+}
+
+ReactDOM.render(
+    <App />,
+    //<SeasonDisplay />
+    document.querySelector('#root')
+);
